@@ -510,13 +510,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - Ensure database initialization scripts ran
 - Verify SQLite is installed
 
-### Getting Help
-
-- 📧 Email: support@bluecarbon-ledger.com
-- 🐛 Issues: [GitHub Issues](https://github.com/yourusername/bluecarbon-ledger/issues)
-- 📖 Documentation: Check the `/docs` directory
-- 💬 Discussions: [GitHub Discussions](https://github.com/yourusername/bluecarbon-ledger/discussions)
-
 ## 🙏 Acknowledgments
 
 - **OpenZeppelin** for smart contract security libraries
