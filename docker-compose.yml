@@ -1,0 +1,298 @@
+# BlueCarbon Ledger - Docker Compose Configuration
+# Fully Automated AI MRV → Government Forwarding Workflow
+
+version: '3.8'
+
+services:
+  # PostgreSQL Database with PostGIS
+  postgres:
+    image: postgis/postgis:15-3.3
+    container_name: bluecarbon-postgres
+    environment:
+      POSTGRES_DB: bluecarbon_ledger
+      POSTGRES_USER: bluecarbon_user
+      POSTGRES_PASSWORD: bluecarbon_secure_password_2024
+      POSTGRES_HOST_AUTH_METHOD: trust
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/database/postgresql-schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+    networks:
+      - bluecarbon-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bluecarbon_user -d bluecarbon_ledger"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # Redis for caching and notifications
+  redis:
+    image: redis:7-alpine
+    container_name: bluecarbon-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - bluecarbon-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # Backend API Server (Node.js + TypeScript)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: bluecarbon-backend
+    environment:
+      NODE_ENV: production
+      PORT: 8000
+      
+      # Database Configuration
+      DATABASE_URL: postgresql://bluecarbon_user:bluecarbon_secure_password_2024@postgres:5432/bluecarbon_ledger
+      
+      # Redis Configuration
+      REDIS_URL: redis://redis:6379
+      
+      # JWT Configuration
+      JWT_SECRET: bluecarbon_super_secret_key_2024_carbon_credits_blockchain_ledger_automated_workflow
+      
+      # AI Service Configuration
+      AI_SERVICE_URL: http://ai-microservice:5000
+      AI_SERVICE_KEY: bluecarbon-ai-service-key-2024-secure
+      
+      # Email Configuration (update with your credentials)
+      EMAIL_USER: mundliyayug@gmail.com
+      EMAIL_PASS: wrir ifya cpiv heup
+      
+      # Blockchain Configuration
+      BLOCKCHAIN_NETWORK: polygon-mumbai
+      BLOCKCHAIN_RPC_URL: https://rpc-mumbai.maticvigil.com
+      PRIVATE_KEY: your-private-key-here
+      CONTRACT_ADDRESS: your-contract-address-here
+      
+      # File Storage Configuration
+      STORAGE_TYPE: local  # or 's3' or 'ipfs'
+      STORAGE_PATH: /app/uploads
+      
+      # Monitoring Configuration
+      ENABLE_METRICS: true
+      METRICS_PORT: 9090
+      
+    ports:
+      - "8000:8000"
+      - "9090:9090"  # Metrics port
+    volumes:
+      - ./backend/uploads:/app/uploads
+      - ./backend/logs:/app/logs
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - bluecarbon-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    restart: unless-stopped
+
+  # AI Microservice (Python Flask)
+  ai-microservice:
+    build:
+      context: ./ai-microservice
+      dockerfile: Dockerfile
+    container_name: bluecarbon-ai
+    environment:
+      FLASK_ENV: production
+      PORT: 5000
+      
+      # AI Service Configuration
+      AI_SERVICE_KEY: bluecarbon-ai-service-key-2024-secure
+      MODEL_VERSION: v1.0.0
+      PROCESSING_NODE_ID: docker-node-1
+      
+      # Model Storage (update when you add your AI model)
+      MODEL_PATH: /app/models
+      MODEL_CACHE_SIZE: 1000
+      
+      # Processing Configuration
+      MAX_CONCURRENT_JOBS: 4
+      PROCESSING_TIMEOUT: 300  # 5 minutes
+      
+      # Satellite Data APIs (add your API keys)
+      SENTINEL_HUB_CLIENT_ID: your-sentinel-hub-client-id
+      SENTINEL_HUB_CLIENT_SECRET: your-sentinel-hub-client-secret
+      GOOGLE_EARTH_ENGINE_KEY: your-gee-service-account-key
+      
+      # GPU Configuration (if using GPU)
+      CUDA_VISIBLE_DEVICES: 0
+      
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./ai-microservice/models:/app/models
+      - ./ai-microservice/data:/app/data
+      - ./ai-microservice/logs:/app/logs
+    networks:
+      - bluecarbon-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    restart: unless-stopped
+    # Uncomment if using GPU
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
+
+  # Frontend React Application
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: bluecarbon-frontend
+    environment:
+      REACT_APP_API_URL: http://localhost:8000/api
+      REACT_APP_AI_SERVICE_URL: http://localhost:5000
+      REACT_APP_BLOCKCHAIN_NETWORK: polygon-mumbai
+      REACT_APP_ENABLE_ANALYTICS: true
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - bluecarbon-network
+    restart: unless-stopped
+
+  # Nginx Reverse Proxy (Production)
+  nginx:
+    image: nginx:alpine
+    container_name: bluecarbon-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/ssl:/etc/nginx/ssl
+    depends_on:
+      - frontend
+      - backend
+      - ai-microservice
+    networks:
+      - bluecarbon-network
+    restart: unless-stopped
+
+  # Monitoring Stack
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: bluecarbon-prometheus
+    ports:
+      - "9091:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    networks:
+      - bluecarbon-network
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: bluecarbon-grafana
+    ports:
+      - "3001:3000"
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: bluecarbon_admin_2024
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources
+    depends_on:
+      - prometheus
+    networks:
+      - bluecarbon-network
+    restart: unless-stopped
+
+  # Log Management
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.8.0
+    container_name: bluecarbon-elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ports:
+      - "9200:9200"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    networks:
+      - bluecarbon-network
+    restart: unless-stopped
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.8.0
+    container_name: bluecarbon-kibana
+    ports:
+      - "5601:5601"
+    environment:
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+    depends_on:
+      - elasticsearch
+    networks:
+      - bluecarbon-network
+    restart: unless-stopped
+
+  # Message Queue (for high-volume processing)
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: bluecarbon-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: bluecarbon
+      RABBITMQ_DEFAULT_PASS: bluecarbon_queue_2024
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - bluecarbon-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
+  elasticsearch_data:
+    driver: local
+  rabbitmq_data:
+    driver: local
+
+networks:
+  bluecarbon-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

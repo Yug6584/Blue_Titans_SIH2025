@@ -1,0 +1,94 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply border-border;
+    box-sizing: border-box;
+  }
+  
+  html, body {
+    max-width: 100vw;
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    @apply bg-gradient-to-br from-ocean-50 to-primary-50 font-sans antialiased;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Prevent horizontal scrolling globally */
+  #root {
+    max-width: 100vw;
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
+
+  /* Responsive container utilities */
+  .responsive-container {
+    width: 100%;
+    max-width: 100vw;
+    min-width: 0;
+    overflow: hidden;
+    box-sizing: border-box;
+  }
+
+  /* Responsive text utilities */
+  .responsive-text {
+    word-break: break-word;
+    hyphens: auto;
+    overflow-wrap: break-word;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-gradient-to-r from-ocean-500 to-primary-500 hover:from-ocean-600 hover:to-primary-600 text-white font-medium px-6 py-3 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5;
+  }
+
+  .btn-secondary {
+    @apply bg-white hover:bg-gray-50 text-gray-700 font-medium px-6 py-3 rounded-lg border border-gray-200 transition-all duration-200 shadow-sm hover:shadow-md;
+  }
+
+  .card {
+    @apply bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-white/20 p-6 transition-all duration-200 hover:shadow-xl;
+  }
+
+  .input-field {
+    @apply w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-ocean-500 focus:ring-2 focus:ring-ocean-500/20 transition-all duration-200 bg-white/50 backdrop-blur-sm;
+  }
+
+  .stat-card {
+    @apply bg-gradient-to-br from-white/90 to-white/70 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-white/30 hover:shadow-xl transition-all duration-300;
+  }
+
+  .nav-link {
+    @apply text-gray-600 hover:text-ocean-600 font-medium transition-colors duration-200 relative;
+  }
+
+  .nav-link.active {
+    @apply text-ocean-600;
+  }
+
+  .nav-link.active::after {
+    @apply content-[''] absolute -bottom-1 left-0 w-full h-0.5 bg-gradient-to-r from-ocean-500 to-primary-500 rounded-full;
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    @apply bg-gradient-to-r from-ocean-600 to-primary-600 bg-clip-text text-transparent;
+  }
+
+  .glass {
+    @apply bg-white/10 backdrop-blur-md border border-white/20;
+  }
+
+  .ocean-gradient {
+    @apply bg-gradient-to-br from-ocean-500 via-primary-500 to-ocean-600;
+  }
+}

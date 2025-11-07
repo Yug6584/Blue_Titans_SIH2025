@@ -1,0 +1,189 @@
+/* Blue Carbon Global Styles - Ocean to Forest Theme */
+
+/* Smooth scrolling for the entire app */
+* {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(2, 69, 111, 0.1);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #02456f 0%, #0b5faf 50%, #3cc4cb 100%);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #0b5faf 0%, #3cc4cb 50%, #6bef07 100%);
+}
+
+/* Dark mode scrollbar */
+[data-theme="dark"] ::-webkit-scrollbar-track {
+  background: rgba(2, 69, 111, 0.3);
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #0b5faf 0%, #3cc4cb 50%, #6bef07 100%);
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #3cc4cb 0%, #6bef07 50%, #00a85c 100%);
+}
+
+/* Selection styling */
+::selection {
+  background: rgba(60, 196, 203, 0.3);
+  color: #02456f;
+}
+
+::-moz-selection {
+  background: rgba(60, 196, 203, 0.3);
+  color: #02456f;
+}
+
+/* Focus outline styling */
+*:focus {
+  outline: 2px solid rgba(11, 95, 175, 0.5);
+  outline-offset: 2px;
+}
+
+/* Smooth transitions for all interactive elements */
+button, .MuiButton-root, .MuiCard-root, .MuiListItemButton-root {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* Glass morphism effect for cards */
+.glass-card {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(2, 69, 111, 0.1);
+}
+
+/* Ocean wave animation */
+@keyframes oceanWave {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-10px) rotate(1deg); }
+}
+
+.ocean-wave {
+  animation: oceanWave 3s ease-in-out infinite;
+}
+
+/* Floating animation for ecosystem images */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-5px); }
+}
+
+.floating {
+  animation: float 4s ease-in-out infinite;
+}
+
+/* Gradient text animation */
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, #02456f 0%, #0b5faf 25%, #3cc4cb 50%, #6bef07 75%, #00a85c 100%);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradientShift 3s ease infinite;
+}
+
+/* Ripple effect for buttons */
+.ripple {
+  position: relative;
+  overflow: hidden;
+}
+
+.ripple::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(60, 196, 203, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.ripple:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+/* Custom loading spinner */
+.ocean-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(11, 95, 175, 0.1);
+  border-top: 3px solid #0b5faf;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Ecosystem card hover effects */
+.ecosystem-card {
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.ecosystem-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 12px 40px rgba(2, 69, 111, 0.2);
+}
+
+/* Notification styles */
+.notification-success {
+  background: linear-gradient(135deg, rgba(107, 239, 7, 0.1) 0%, rgba(0, 168, 92, 0.1) 100%);
+  border-left: 4px solid #00a85c;
+}
+
+.notification-info {
+  background: linear-gradient(135deg, rgba(11, 95, 175, 0.1) 0%, rgba(60, 196, 203, 0.1) 100%);
+  border-left: 4px solid #0b5faf;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .glass-card {
+    backdrop-filter: blur(5px);
+  }
+  
+  .ecosystem-card:hover {
+    transform: translateY(-4px) scale(1.01);
+  }
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  * {
+    background: white !important;
+    color: black !important;
+  }
+}

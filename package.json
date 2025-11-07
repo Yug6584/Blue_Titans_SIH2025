@@ -1,0 +1,35 @@
+{
+  "name": "blue-carbon-credit-system",
+  "version": "1.0.0",
+  "description": "Production-ready Solidity smart contract ecosystem for Blue Carbon Credit Management",
+  "main": "index.js",
+  "scripts": {
+    "start": "node start-project.js",
+    "start:test": "node start-project.js --test",
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "deploy:localhost": "hardhat run scripts/deploy.js --network localhost",
+    "deploy:polygon": "hardhat run scripts/deploy.js --network polygon",
+    "lint": "solhint 'contracts/**/*.sol'",
+    "coverage": "hardhat coverage",
+    "frontend": "cd frontend && node server.js"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "@openzeppelin/contracts": "^5.0.0",
+    "hardhat": "^2.19.0",
+    "solhint": "^4.0.0"
+  },
+  "keywords": [
+    "blockchain",
+    "carbon-credits",
+    "solidity",
+    "defi",
+    "sustainability"
+  ],
+  "author": "Blue Carbon Team",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^17.2.3"
+  }
+}

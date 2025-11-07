@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API Test</title>
+</head>
+<body>
+    <h1>API Test</h1>
+    <button onclick="testAPIs()">Test APIs</button>
+    <div id="results"></div>
+
+    <script>
+        async function testAPIs() {
+            const results = document.getElementById('results');
+            results.innerHTML = '<p>Testing APIs...</p>';
+            
+            try {
+                // Test login activities API
+                console.log('Testing login activities API...');
+                const response = await fetch('http://localhost:8000/api/stats/login-activities?limit=5');
+                const data = await response.json();
+                
+                console.log('API Response:', data);
+                
+                if (data.success) {
+                    results.innerHTML = `
+                        <h2>✅ API Test Successful</h2>
+                        <p><strong>Total Activities:</strong> ${data.data.totalCount}</p>
+                        <p><strong>Retrieved:</strong> ${data.data.activities.length} activities</p>
+                        <h3>Recent Login Activities:</h3>
+                        <ul>
+                            ${data.data.activities.map(activity => `
+                                <li>
+                                    <strong>${activity.name || activity.email}</strong> 
+                                    (${activity.panel}) - ${activity.timeAgo}
+                                    <br>Status: ${activity.loginStatus}
+                                </li>
+                            `).join('')}
+                        </ul>
+                    `;
+                } else {
+                    results.innerHTML = '<h2>❌ API Test Failed</h2><p>' + data.message + '</p>';
+                }
+            } catch (error) {
+                console.error('API Test Error:', error);
+                results.innerHTML = '<h2>❌ API Test Error</h2><p>' + error.message + '</p>';
+            }
+        }
+    </script>
+</body>
+</html>
